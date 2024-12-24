@@ -25,7 +25,7 @@ It allows you to manage connections, track history, and interact with databases 
     sudo apt-get install pgcli
     # For MacOS
     brew install pgcli
-
+### Installation
 1. Clone the repository:
     ```bash
     git clone https://github.com/Kazilsky/pgcli_manager.git
