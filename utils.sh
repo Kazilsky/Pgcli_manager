@@ -18,7 +18,7 @@ initialize_config() {
 # Функция добавления нового подключения
 add_connection() {
     local name="$1"
-    local host="localhost"
+    local host="127.0.0.1"
     local port="5432"
     local database="$2"
     local user="$3"
@@ -132,4 +132,60 @@ show_history() {
     else
         echo -e "${YELLOW}История подключений пуста.${RESET}"
     fi
+}
+
+load_alias_settings() {
+    if [[ -f "$ALIAS_FILE" ]]; then
+        source "$ALIAS_FILE"
+    else
+        echo "alias_enabled=off" > "$ALIAS_FILE"
+        echo "default_alias=" >> "$ALIAS_FILE"
+        source "$ALIAS_FILE"
+    fi
+}
+
+# Function to save alias settings
+save_alias_settings() {
+    echo "alias_enabled=$alias_enabled" > "$ALIAS_FILE"
+    echo "default_alias=$default_alias" >> "$ALIAS_FILE"
+}
+
+
+# Function to toggle alias mode
+alias_toggle() {
+    local mode="$1"
+
+    if [[ "$mode" == "on" ]]; then
+        alias_enabled="on"
+        echo "Alias mode enabled."
+    elif [[ "$mode" == "off" ]]; then
+        alias_enabled="off"
+        echo "Alias mode disabled."
+    else
+        echo "Usage: pgm alias on|off"
+        return
+    fi
+    save_alias_settings
+}
+
+# Function to set default alias
+set_default_alias() {
+    local name="$1"
+
+    if [[ -z "$name" ]]; then
+        if [[ -z "$default_alias" ]]; then
+            echo "No default alias set."
+        else
+            echo "Current default alias: $default_alias"
+        fi
+        return
+    fi
+
+    if grep -q "^$name|" "$CONFIG_FILE"; then
+        default_alias="$name"
+        echo "Default alias set to '$name'."
+    else
+        echo "Connection '$name' not found."
+    fi
+    save_alias_settings
 }
